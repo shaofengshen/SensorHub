@@ -2,7 +2,14 @@ import network
 import socket
 import time
 import json
+from machine import ADC
 
+light = ADC(27)
+
+def get_light_intensity():
+    return int(light.read_u16() * 101 / 65536)
+
+# 连接WiFi
 def connect_wifi():
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
@@ -28,6 +35,7 @@ def connect_wifi():
         return True
     return False
 
+# 向指定的服务器发送数据
 def send_message():
     HOST = '106.52.184.158'
     PORT = 5000
@@ -36,10 +44,9 @@ def send_message():
         s = socket.socket()
         print(f'连接到服务器 {HOST}:{PORT}...')
         s.connect((HOST, PORT))
-        
+        light_intensity = get_light_intensity()
         data = {
-            "humidity": 40,
-            "temperature": 18,
+            "light_intensity": light_intensity,
             "timestamp": time.time()
         }
         
